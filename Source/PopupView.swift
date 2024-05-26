@@ -20,15 +20,14 @@ public enum DismissSource {
 }
 
 public struct Popup<PopupContent: View>: ViewModifier {
-
     init(params: Popup<PopupContent>.PopupParameters,
          view: @escaping () -> PopupContent,
          shouldShowContent: Bool,
          showContent: Bool,
          positionIsCalculatedCallback: @escaping () -> (),
          animationCompletedCallback: @escaping () -> (),
-         dismissCallback: @escaping (DismissSource)->()) {
-
+         dismissCallback: @escaping (DismissSource) -> ())
+    {
         self.type = params.type
         self.position = params.position ?? params.type.defaultPosition
         self.appearFrom = params.appearFrom
@@ -53,7 +52,6 @@ public struct Popup<PopupContent: View>: ViewModifier {
     }
 
     public enum PopupType {
-
         case `default`
         case toast
         case floater(verticalPadding: CGFloat = 10, horizontalPadding: CGFloat = 10, useSafeAreaInset: Bool = true)
@@ -169,13 +167,13 @@ public struct Popup<PopupContent: View>: ViewModifier {
         var useKeyboardSafeArea: Bool = false
 
         /// called when when dismiss animation starts
-        var willDismissCallback: (DismissSource) -> () = {_ in}
+        var willDismissCallback: (DismissSource) -> () = { _ in }
 
         /// called when when dismiss animation ends
-        var dismissCallback: (DismissSource) -> () = {_ in}
+        var dismissCallback: (DismissSource) -> () = { _ in }
 
         var isCustomHeight: Bool = false
-        
+
         public func type(_ type: PopupType) -> PopupParameters {
             var params = self
             params.type = type
@@ -233,7 +231,7 @@ public struct Popup<PopupContent: View>: ViewModifier {
             return params
         }
 
-        public func backgroundView<BackgroundView: View>(_ backgroundView: ()->(BackgroundView)) -> PopupParameters {
+        public func backgroundView<BackgroundView: View>(_ backgroundView: () -> (BackgroundView)) -> PopupParameters {
             var params = self
             params.backgroundView = AnyView(backgroundView())
             return params
@@ -303,7 +301,7 @@ public struct Popup<PopupContent: View>: ViewModifier {
             switch self {
             case .inactive:
                 return .zero
-            case .dragging(let translation):
+            case let .dragging(translation):
                 return translation
             }
         }
@@ -352,7 +350,7 @@ public struct Popup<PopupContent: View>: ViewModifier {
     var animationCompletedCallback: () -> ()
 
     /// Call dismiss callback with dismiss source
-    var dismissCallback: (DismissSource)->()
+    var dismissCallback: (DismissSource) -> ()
 
     var view: () -> PopupContent
 
@@ -368,7 +366,7 @@ public struct Popup<PopupContent: View>: ViewModifier {
     /// The rect and safe area of popup content
     @State private var sheetContentRect: CGRect = .zero
 
-    @State private var safeAreaInsets: EdgeInsets = EdgeInsets()
+    @State private var safeAreaInsets: EdgeInsets = .init()
 
     /// Variable used to control what is animated and what is not
     @State var actualCurrentOffset = CGPoint.pointFarAwayFromScreen
@@ -382,6 +380,7 @@ public struct Popup<PopupContent: View>: ViewModifier {
     @State private var lastDragPosition: CGSize = .zero
 
     // MARK: - Drag to dismiss with scroll
+
 #if os(iOS)
     /// UIScrollView delegate, needed for calling didEndDragging
     @StateObject private var scrollViewDelegate = PopupScrollViewDelegate()
@@ -399,17 +398,17 @@ public struct Popup<PopupContent: View>: ViewModifier {
     private var displayedOffsetY: CGFloat {
         if isOpaque {
             if position.isTop {
-                return verticalPadding + (useSafeAreaInset ? 0 :  -safeAreaInsets.top)
+                return verticalPadding + (useSafeAreaInset ? 0 : -safeAreaInsets.top)
             }
             if position.isVerticalCenter {
                 return (screenHeight - sheetContentRect.height)/2 - safeAreaInsets.top
             }
             if position.isBottom {
                 return screenHeight - sheetContentRect.height
-                - (useKeyboardSafeArea ? keyboardHeightHelper.keyboardHeight : 0)
-                - verticalPadding
-                - (useSafeAreaInset ? safeAreaInsets.bottom : 0)
-                - safeAreaInsets.top
+                    - (useKeyboardSafeArea ? keyboardHeightHelper.keyboardHeight : 0)
+                    - verticalPadding
+                    - (useSafeAreaInset ? safeAreaInsets.bottom : 0)
+                    - safeAreaInsets.top
             }
         }
 
@@ -421,11 +420,11 @@ public struct Popup<PopupContent: View>: ViewModifier {
         }
         if position.isBottom {
             return presenterContentRect.height
-            - sheetContentRect.height
-            - (useKeyboardSafeArea ? keyboardHeightHelper.keyboardHeight : 0)
-            - verticalPadding
-            + safeAreaInsets.bottom
-            - (useSafeAreaInset ? safeAreaInsets.bottom : 0)
+                - sheetContentRect.height
+                - (useKeyboardSafeArea ? keyboardHeightHelper.keyboardHeight : 0)
+                - verticalPadding
+                + safeAreaInsets.bottom
+                - (useSafeAreaInset ? safeAreaInsets.bottom : 0)
         }
         return 0
     }
@@ -500,7 +499,7 @@ public struct Popup<PopupContent: View>: ViewModifier {
 
         scrollViewDelegate.scrollView = scrollView
         scrollViewDelegate.addGestureIfNeeded()
-        let referenceY = sheetContentRect.height / 3
+        let referenceY = sheetContentRect.height/3
 
         DispatchQueue.main.async {
             scrollViewContentHeight = scrollView.contentSize.height
@@ -560,16 +559,15 @@ public struct Popup<PopupContent: View>: ViewModifier {
     private func contentView() -> some View {
 #if os(iOS)
         switch type {
-        case .scroll(let headerView):
+        case let .scroll(headerView):
             VStack(spacing: 0) {
                 headerView
                     .fixedSize(horizontal: false, vertical: true)
                 if isCustomHeight {
-                      view()
-                }else{
                     view()
-                    .frame(maxHeight: scrollViewContentHeight)
-                    }
+                } else {
+                    view()
+                        .frame(maxHeight: scrollViewContentHeight)
                 }
             }
             .introspect(.scrollView, on: .iOS(.v15, .v16, .v17)) { scrollView in
@@ -617,7 +615,7 @@ public struct Popup<PopupContent: View>: ViewModifier {
                         }
                     }
                 }
-                .onChange(of: sheetContentRect.size) { sheetContentRect in
+                .onChange(of: sheetContentRect.size) { _ in
                     positionIsCalculatedCallback()
                 }
         }
@@ -667,8 +665,8 @@ public struct Popup<PopupContent: View>: ViewModifier {
     }
 
     private func onDragEnded(drag: DragGesture.Value) {
-        let referenceX = sheetContentRect.width / 3
-        let referenceY = sheetContentRect.height / 3
+        let referenceX = sheetContentRect.width/3
+        let referenceY = sheetContentRect.height/3
 
         var shouldDismiss = false
         switch calculatedAppearFrom {
