@@ -556,7 +556,7 @@ public struct Popup<PopupContent: View>: ViewModifier {
                     view()
             
                 // no heigher than its contents
-                .frame(maxHeight: scrollViewContentHeight)
+                // .frame(maxHeight: scrollViewContentHeight)
             }
             .introspect(.scrollView, on: .iOS(.v15, .v16, .v17)) { scrollView in
                 configure(scrollView: scrollView)
