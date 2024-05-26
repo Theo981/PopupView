@@ -48,7 +48,7 @@ public struct Popup<PopupContent: View>: ViewModifier {
         self.animationCompletedCallback = animationCompletedCallback
         self.dismissCallback = dismissCallback
         self.dismissCallback = dismissCallback
-        self.isCustomHeight = isCustomHeight
+        self.isCustomHeight = params.isCustomHeight
     }
 
     public enum PopupType {
