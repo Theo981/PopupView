@@ -48,6 +48,8 @@ public struct Popup<PopupContent: View>: ViewModifier {
         self.positionIsCalculatedCallback = positionIsCalculatedCallback
         self.animationCompletedCallback = animationCompletedCallback
         self.dismissCallback = dismissCallback
+        self.dismissCallback = dismissCallback
+        self.scrollViewContentHeight = scrollViewContentHeight
     }
 
     public enum PopupType {
@@ -172,6 +174,8 @@ public struct Popup<PopupContent: View>: ViewModifier {
         /// called when when dismiss animation ends
         var dismissCallback: (DismissSource) -> () = {_ in}
 
+        var scrollViewContentHeight: Double?
+        
         public func type(_ type: PopupType) -> PopupParameters {
             var params = self
             params.type = type
@@ -281,6 +285,12 @@ public struct Popup<PopupContent: View>: ViewModifier {
             params.dismissCallback = { _ in
                 dismissCallback()
             }
+            return params
+        }
+
+        public func scrollViewContentHeight(_ scrollViewContentHeight: Double?) -> PopupParameters {
+            var params = self
+            params.scrollViewContentHeight = scrollViewContentHeight
             return params
         }
     }
