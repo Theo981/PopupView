@@ -49,7 +49,7 @@ public struct Popup<PopupContent: View>: ViewModifier {
         self.animationCompletedCallback = animationCompletedCallback
         self.dismissCallback = dismissCallback
         self.dismissCallback = dismissCallback
-        self.scrollViewContentHeight = scrollViewContentHeight
+        self.isCustomHeight = isCustomHeight
     }
 
     public enum PopupType {
@@ -174,7 +174,7 @@ public struct Popup<PopupContent: View>: ViewModifier {
         /// called when when dismiss animation ends
         var dismissCallback: (DismissSource) -> () = {_ in}
 
-        var scrollViewContentHeight: Double?
+        var isCustomHeight: Bool = false
         
         public func type(_ type: PopupType) -> PopupParameters {
             var params = self
@@ -288,9 +288,9 @@ public struct Popup<PopupContent: View>: ViewModifier {
             return params
         }
 
-        public func scrollViewContentHeight(_ scrollViewContentHeight: Double?) -> PopupParameters {
+        public func isCustomHeight(_ isCustomHeight: Bool?) -> PopupParameters {
             var params = self
-            params.scrollViewContentHeight = scrollViewContentHeight
+            params.isCustomHeight = isCustomHeight
             return params
         }
     }
@@ -355,6 +355,8 @@ public struct Popup<PopupContent: View>: ViewModifier {
     var dismissCallback: (DismissSource)->()
 
     var view: () -> PopupContent
+
+    var isCustomHeight: Bool
 
     // MARK: - Private Properties
 
@@ -562,7 +564,10 @@ public struct Popup<PopupContent: View>: ViewModifier {
             VStack(spacing: 0) {
                 headerView
                     .fixedSize(horizontal: false, vertical: true)
-                    view().frame(maxHeight: scrollViewContentHeight)
+                    view()
+                #if(isCustomHeight){
+                    .frame(maxHeight: scrollViewContentHeight)
+                }
             }
             .introspect(.scrollView, on: .iOS(.v15, .v16, .v17)) { scrollView in
                 configure(scrollView: scrollView)
