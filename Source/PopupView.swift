@@ -564,9 +564,12 @@ public struct Popup<PopupContent: View>: ViewModifier {
             VStack(spacing: 0) {
                 headerView
                     .fixedSize(horizontal: false, vertical: true)
+                if isCustomHeight {
+                      view()
+                }else{
                     view()
-                #if(isCustomHeight){
                     .frame(maxHeight: scrollViewContentHeight)
+                    }
                 }
             }
             .introspect(.scrollView, on: .iOS(.v15, .v16, .v17)) { scrollView in
