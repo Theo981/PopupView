@@ -40,7 +40,7 @@ public struct Popup<PopupContent: View>: ViewModifier {
         self.dragToDismiss = params.dragToDismiss
         self.closeOnTap = params.closeOnTap
         self.isOpaque = params.isOpaque
-
+        self.isCustomHeight = params.isCustomHeight
         self.view = view
 
         self.shouldShowContent = shouldShowContent
@@ -172,6 +172,8 @@ public struct Popup<PopupContent: View>: ViewModifier {
         /// called when when dismiss animation ends
         var dismissCallback: (DismissSource) -> () = {_ in}
 
+        var isCustomHeight: Bool = false
+        
         public func type(_ type: PopupType) -> PopupParameters {
             var params = self
             params.type = type
@@ -283,6 +285,12 @@ public struct Popup<PopupContent: View>: ViewModifier {
             }
             return params
         }
+
+        public func isCustomHeight(_ isCustomHeight: Bool) -> PopupParameters {
+            var params = self
+            params.isCustomHeight = isCustomHeight
+            return params
+        }
     }
 
     private enum DragState {
@@ -345,6 +353,8 @@ public struct Popup<PopupContent: View>: ViewModifier {
     var dismissCallback: (DismissSource)->()
 
     var view: () -> PopupContent
+
+    var isCustomHeight: Bool
 
     // MARK: - Private Properties
 
@@ -552,11 +562,17 @@ public struct Popup<PopupContent: View>: ViewModifier {
             VStack(spacing: 0) {
                 headerView
                     .fixedSize(horizontal: false, vertical: true)
-                ScrollView {
+                if isCustomHeight {
                     view()
+                } else {
+                    view()
+                        .frame(maxHeight: scrollViewContentHeight)
                 }
-                // no heigher than its contents
-                .frame(maxHeight: scrollViewContentHeight)
+                // ScrollView {
+                //     view()
+                // }
+                // // no heigher than its contents
+                // .frame(maxHeight: scrollViewContentHeight)
             }
             .introspect(.scrollView, on: .iOS(.v15, .v16, .v17)) { scrollView in
                 configure(scrollView: scrollView)
