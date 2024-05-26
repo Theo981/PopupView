@@ -552,9 +552,9 @@ public struct Popup<PopupContent: View>: ViewModifier {
             VStack(spacing: 0) {
                 headerView
                     .fixedSize(horizontal: false, vertical: true)
-                ScrollView {
+        
                     view()
-                }
+            
                 // no heigher than its contents
                 .frame(maxHeight: scrollViewContentHeight)
             }
