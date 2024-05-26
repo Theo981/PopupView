@@ -286,7 +286,7 @@ public struct Popup<PopupContent: View>: ViewModifier {
             return params
         }
 
-        public func isCustomHeight(_ isCustomHeight: Bool?) -> PopupParameters {
+        public func isCustomHeight(_ isCustomHeight: Bool) -> PopupParameters {
             var params = self
             params.isCustomHeight = isCustomHeight
             return params
