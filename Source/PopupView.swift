@@ -562,11 +562,7 @@ public struct Popup<PopupContent: View>: ViewModifier {
             VStack(spacing: 0) {
                 headerView
                     .fixedSize(horizontal: false, vertical: true)
-        
-                    view()
-            
-                // no heigher than its contents
-                // .frame(maxHeight: scrollViewContentHeight)
+                    view().frame(maxHeight: scrollViewContentHeight)
             }
             .introspect(.scrollView, on: .iOS(.v15, .v16, .v17)) { scrollView in
                 configure(scrollView: scrollView)
